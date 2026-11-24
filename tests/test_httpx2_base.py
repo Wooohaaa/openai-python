@@ -29,6 +29,13 @@ def test_base_import_does_not_load_legacy_httpx() -> None:
     )
 
 
+def test_prepare_url_preserves_base_url_query() -> None:
+    with OpenAI(api_key="test", base_url="https://example.test/v1?key=abc") as client:
+        assert str(client._prepare_url("chat/completions")) == (
+            "https://example.test/v1/chat/completions?key=abc"
+        )
+
+
 @pytest.mark.respx2(base_url="https://example.test/v1")
 def test_default_client_and_respx_use_httpx2(respx2_mock: MockRouter) -> None:
     route = respx2_mock.get("/models").mock(return_value=httpx2.Response(200, json={"object": "list", "data": []}))
